@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴직금 계산기 - 2025년 최신 근로기준법 반영</title>
+    <meta name="description" content="퇴직금 자동 계산기. 근속연수별 퇴직금, 평균임금 계산, 퇴직소득세 계산. 2025년 최신 근로기준법 반영.">
+    <meta name="keywords" content="퇴직금, 퇴직금계산기, 평균임금, 퇴직소득세, 근속연수, 퇴직연금">
+    <meta property="og:title" content="퇴직금 계산기 - 정확한 퇴직금 자동 계산">
+    <meta property="og:description" content="근속연수별 퇴직금, 평균임금, 퇴직소득세 한번에 계산. 2025년 최신 법률 반영">
+    <meta property="og:type" content="website">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        h1 {
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        nav a {
+            padding: 12px 20px;
+            background: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        nav a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .info-box {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .info-box p {
+            color: #555;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        .calc-group {
+            margin-bottom: 25px;
+        }
+        .calc-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .hint {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 5px;
+        }
+        .calc-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .calc-button:hover {
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result h3 {
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-value {
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        .warning strong {
+            color: #856404;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.6em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💼 퇴직금 계산기</h1>
+            <p class="subtitle">2025년 최신 근로기준법 반영 · 정확한 퇴직금 계산</p>
+        </header>
+
+        <nav>
+            <a href="index.html">💼 퇴직금 계산</a>
+            <a href="severance-pension.html">🏦 퇴직연금</a>
+            <a href="interim-settlement.html">📝 중간정산</a>
+            <a href="tax-calculator.html">💰 퇴직소득세</a>
+            <a href="retirement-guide.html">📖 퇴직 가이드</a>
+        </nav>
+
+        <div class="info-box">
+            <h3>📌 퇴직금이란?</h3>
+            <p><strong>지급 대상:</strong> 계속 근로기간 1년 이상인 근로자</p>
+            <p><strong>계산 공식:</strong> 1일 평균임금 × 30일 × (재직일수 ÷ 365)</p>
+            <p><strong>평균임금:</strong> 퇴직 전 3개월간 지급받은 임금 총액 ÷ 총 일수</p>
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">💰 월 평균 급여 (만원)</label>
+            <input type="number" id="monthlySalary" placeholder="예: 300 (세전 급여)">
+            <div class="hint">💡 퇴직 전 3개월 평균 급여를 입력하세요 (세전 기준)</div>
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">📅 근속 기간</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <input type="number" id="workYears" placeholder="년" min="0">
+                    <div class="hint">년</div>
+                </div>
+                <div>
+                    <input type="number" id="workMonths" placeholder="개월" min="0" max="11">
+                    <div class="hint">개월</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">🎁 상여금 (연간, 만원)</label>
+            <input type="number" id="bonus" placeholder="예: 400 (연간 상여금 총액)" value="0">
+            <div class="hint">💡 없으면 0으로 두세요</div>
+        </div>
+
+        <button class="calc-button" onclick="calculate()">💼 퇴직금 계산하기</button>
+
+        <div id="result" class="result">
+            <h3>💳 계산 결과</h3>
+            <div class="result-item">
+                <span>1일 평균임금</span>
+                <span class="result-value" id="dailyWage">-</span>
+            </div>
+            <div class="result-item">
+                <span>총 근속일수</span>
+                <span class="result-value" id="totalDays">-</span>
+            </div>
+            <div class="result-item">
+                <span>예상 퇴직금</span>
+                <span class="result-value" id="severancePay">-</span>
+            </div>
+            <div class="result-item">
+                <span>퇴직소득세 (약)</span>
+                <span class="result-value" id="tax">-</span>
+            </div>
+            <div class="result-item" style="border-top: 2px solid rgba(255,255,255,0.5); margin-top: 10px; padding-top: 15px;">
+                <span><strong>실수령액 (약)</strong></span>
+                <span class="result-value" id="netAmount">-</span>
+            </div>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ 중요 안내사항</strong>
+            <p>본 계산기는 참고용이며, 실제 퇴직금은 개인의 근로 조건에 따라 다를 수 있습니다.</p>
+            <p>정확한 퇴직금 계산은 회사 인사팀 또는 노무사에게 문의하시기 바랍니다.</p>
+        </div>
+
+        <footer>
+            <p>💡 더 많은 정보: <a href="severance-pension.html">퇴직연금</a> | <a href="tax-calculator.html">퇴직소득세</a> | <a href="retirement-guide.html">퇴직 가이드</a></p>
+            <p>© 2025 퇴직금 계산기 | 정보 출처: 고용노동부</p>
+        </footer>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return Math.round(num).toLocaleString('ko-KR') + '원';
+        }
+
+        function calculate() {
+            const monthlySalary = parseFloat(document.getElementById('monthlySalary').value) * 10000;
+            const years = parseFloat(document.getElementById('workYears').value || 0);
+            const months = parseFloat(document.getElementById('workMonths').value || 0);
+            const annualBonus = parseFloat(document.getElementById('bonus').value || 0) * 10000;
+
+            if (!monthlySalary || (years === 0 && months === 0)) {
+                alert('월 급여와 근속기간을 입력해주세요!');
+                return;
+            }
+
+            // 총 근속일수
+            const totalDays = (years * 365) + (months * 30);
+
+            if (totalDays < 365) {
+                alert('퇴직금은 1년 이상 근무 시 지급됩니다.');
+                return;
+            }
+
+            // 1일 평균임금 계산
+            // (3개월 급여 + 3개월분 상여금) / 90일
+            const threeMonthSalary = monthlySalary * 3;
+            const threeMonthBonus = (annualBonus / 12) * 3;
+            const dailyWage = (threeMonthSalary + threeMonthBonus) / 90;
+
+            // 퇴직금 = 1일 평균임금 × 30일 × (재직일수 / 365)
+            const severancePay = dailyWage * 30 * (totalDays / 365);
+
+            // 퇴직소득세 간단 계산 (실제는 복잡함, 약 5~10% 가정)
+            let taxRate = 0.05;
+            if (severancePay > 80000000) taxRate = 0.10;
+            if (severancePay > 150000000) taxRate = 0.12;
+            
+            const tax = severancePay * taxRate;
+            const netAmount = severancePay - tax;
+
+            // 결과 표시
+            document.getElementById('dailyWage').textContent = formatNumber(dailyWage);
+            document.getElementById('totalDays').textContent = totalDays.toLocaleString('ko-KR') + '일';
+            document.getElementById('severancePay').textContent = formatNumber(severancePay);
+            document.getElementById('tax').textContent = formatNumber(tax);
+            document.getElementById('netAmount').textContent = formatNumber(netAmount);
+            document.getElementById('result').classList.add('show');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴직연금 계산기 - DB형 DC형 비교</title>
+    <meta name="description" content="퇴직연금 DB형, DC형 비교 계산기. 확정급여형 vs 확정기여형 수령액 비교. 2025년 최신 법률 반영.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #667eea; }
+        h1 { font-size: 2.2em; color: #333; }
+        nav { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        nav a { padding: 12px 20px; background: #f0f0f0; color: #333; text-decoration: none; border-radius: 8px; transition: all 0.3s; }
+        nav a:hover { background: #667eea; color: white; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; }
+        .tab { flex: 1; padding: 15px; background: #f0f0f0; border: none; border-radius: 10px; cursor: pointer; font-size: 1em; font-weight: 600; transition: all 0.3s; }
+        .tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .info-box { background: #f8f9ff; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .calc-group { margin-bottom: 25px; }
+        .calc-label { display: block; font-weight: 600; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; }
+        .hint { font-size: 0.9em; color: #888; margin-top: 5px; }
+        .calc-button { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: 600; cursor: pointer; }
+        .result { margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; display: none; }
+        .result.show { display: block; }
+        .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .result-value { font-weight: 700; font-size: 1.2em; }
+        footer { margin-top: 40px; text-align: center; color: #666; }
+        footer a { color: #667eea; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏦 퇴직연금 계산기</h1>
+        </header>
+
+        <nav>
+            <a href="index.html">💼 퇴직금 계산</a>
+            <a href="severance-pension.html">🏦 퇴직연금</a>
+            <a href="interim-settlement.html">📝 중간정산</a>
+            <a href="tax-calculator.html">💰 퇴직소득세</a>
+            <a href="retirement-guide.html">📖 퇴직 가이드</a>
+        </nav>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('db')">DB형 (확정급여)</button>
+            <button class="tab" onclick="switchTab('dc')">DC형 (확정기여)</button>
+        </div>
+
+        <!-- DB형 탭 -->
+        <div id="db" class="tab-content active">
+            <div class="info-box">
+                <h3>📌 DB형 (확정급여형)이란?</h3>
+                <p><strong>특징:</strong> 퇴직 시 받을 금액이 사전에 확정</p>
+                <p><strong>계산:</strong> 평균임금 × 근속연수 기준</p>
+                <p><strong>장점:</strong> 안정적, 회사가 운용 리스크 부담</p>
+            </div>
+
+            <div class="calc-group">
+                <label class="calc-label">💰 월 평균 급여 (만원)</label>
+                <input type="number" id="salaryDB" placeholder="예: 300">
+            </div>
+
+            <div class="calc-group">
+                <label class="calc-label">📅 근속 연수 (년)</label>
+                <input type="number" id="yearsDB" placeholder="예: 10">
+            </div>
+
+            <button class="calc-button" onclick="calculateDB()">💼 DB형 수령액 계산</button>
+
+            <div id="resultDB" class="result">
+                <h3>💳 예상 수령액</h3>
+                <div class="result-item">
+                    <span>퇴직연금 수령액</span>
+                    <span class="result-value" id="amountDB">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DC형 탭 -->
+        <div id="dc" class="tab-content">
+            <div class="info-box">
+                <h3>📌 DC형 (확정기여형)이란?</h3>
+                <p><strong>특징:</strong> 매년 회사가 내는 금액이 확정 (연봉의 1/12)</p>
+                <p><strong>운용:</strong> 본인이 직접 펀드 등에 투자</p>
+                <p><strong>장점:</strong> 운용 수익에 따라 수령액 증가 가능</p>
+            </div>
+
+            <div class="calc-group">
+                <label class="calc-label">💰 연봉 (만원)</label>
+                <input type="number" id="salaryDC" placeholder="예: 3600">
+            </div>
+
+            <div class="calc-group">
+                <label class="calc-label">📅 근속 연수 (년)</label>
+                <input type="number" id="yearsDC" placeholder="예: 10">
+            </div>
+
+            <div class="calc-group">
+                <label class="calc-label">📈 연평균 수익률 (%)</label>
+                <input type="number" step="0.1" id="returnRate" placeholder="예: 3.5" value="3.5">
+                <div class="hint">💡 2020-2024 평균: 약 3~4%</div>
+            </div>
+
+            <button class="calc-button" onclick="calculateDC()">💼 DC형 수령액 계산</button>
+
+            <div id="resultDC" class="result">
+                <h3>💳 예상 수령액</h3>
+                <div class="result-item">
+                    <span>총 납입액</span>
+                    <span class="result-value" id="totalContribution">-</span>
+                </div>
+                <div class="result-item">
+                    <span>운용 수익</span>
+                    <span class="result-value" id="profit">-</span>
+                </div>
+                <div class="result-item">
+                    <span>최종 수령액</span>
+                    <span class="result-value" id="amountDC">-</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>💡 더 많은 정보: <a href="index.html">퇴직금</a> | <a href="tax-calculator.html">퇴직소득세</a></p>
+            <p>© 2025 퇴직금 계산기</p>
+        </footer>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function formatNumber(num) {
+            return Math.round(num).toLocaleString('ko-KR') + '원';
+        }
+
+        function calculateDB() {
+            const salary = parseFloat(document.getElementById('salaryDB').value) * 10000;
+            const years = parseFloat(document.getElementById('yearsDB').value);
+
+            if (!salary || !years) {
+                alert('모든 값을 입력해주세요!');
+                return;
+            }
+
+            // DB형: 평균임금 × 30일 × 근속연수
+            const amount = salary * 12 * years / 12;
+
+            document.getElementById('amountDB').textContent = formatNumber(amount);
+            document.getElementById('resultDB').classList.add('show');
+        }
+
+        function calculateDC() {
+            const annualSalary = parseFloat(document.getElementById('salaryDC').value) * 10000;
+            const years = parseFloat(document.getElementById('yearsDC').value);
+            const returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
+
+            if (!annualSalary || !years) {
+                alert('모든 값을 입력해주세요!');
+                return;
+            }
+
+            // DC형: 매년 연봉의 1/12 적립 + 운용수익
+            const annualContribution = annualSalary / 12;
+            let totalAmount = 0;
+
+            for (let i = 0; i < years; i++) {
+                totalAmount = (totalAmount + annualContribution) * (1 + returnRate);
+            }
+
+            const totalContribution = annualContribution * years;
+            const profit = totalAmount - totalContribution;
+
+            document.getElementById('totalContribution').textContent = formatNumber(totalContribution);
+            document.getElementById('profit').textContent = formatNumber(profit);
+            document.getElementById('amountDC').textContent = formatNumber(totalAmount);
+            document.getElementById('resultDC').classList.add('show');
+        }
+    </script>
+</body>
+</html>

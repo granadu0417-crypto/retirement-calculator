@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴직금 중간정산 계산기 - 가능 여부 및 금액 계산</title>
+    <meta name="description" content="퇴직금 중간정산 계산기. 중간정산 가능 사유, 신청 방법, 예상 수령액 계산.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #667eea; }
+        h1 { font-size: 2.2em; color: #333; }
+        nav { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        nav a { padding: 12px 20px; background: #f0f0f0; color: #333; text-decoration: none; border-radius: 8px; transition: all 0.3s; }
+        nav a:hover { background: #667eea; color: white; }
+        .info-box { background: #f8f9ff; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin-bottom: 30px; border-radius: 10px; }
+        .calc-group { margin-bottom: 25px; }
+        .calc-label { display: block; font-weight: 600; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; }
+        .hint { font-size: 0.9em; color: #888; margin-top: 5px; }
+        .calc-button { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: 600; cursor: pointer; }
+        .result { margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; display: none; }
+        .result.show { display: block; }
+        .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .result-value { font-weight: 700; font-size: 1.2em; }
+        ul { margin-left: 20px; line-height: 1.8; }
+        footer { margin-top: 40px; text-align: center; color: #666; }
+        footer a { color: #667eea; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 퇴직금 중간정산</h1>
+        </header>
+
+        <nav>
+            <a href="index.html">💼 퇴직금 계산</a>
+            <a href="severance-pension.html">🏦 퇴직연금</a>
+            <a href="interim-settlement.html">📝 중간정산</a>
+            <a href="tax-calculator.html">💰 퇴직소득세</a>
+            <a href="retirement-guide.html">📖 퇴직 가이드</a>
+        </nav>
+
+        <div class="warning-box">
+            <h3 style="color: #856404; margin-bottom: 10px;">⚠️ 중간정산 제한</h3>
+            <p style="color: #856404;">2012년 7월 26일부터 퇴직금 중간정산이 원칙적으로 금지되었습니다.</p>
+            <p style="color: #856404; margin-top: 10px;"><strong>법정 허용 사유에만 가능합니다!</strong></p>
+        </div>
+
+        <div class="info-box">
+            <h3>📌 중간정산 가능 사유</h3>
+            <ul>
+                <li><strong>무주택자 주택 구입:</strong> 본인 명의 주택 구입 (전세 불가)</li>
+                <li><strong>주택 전세금:</strong> 무주택자의 전세보증금 또는 임차보증금</li>
+                <li><strong>6개월 이상 요양:</strong> 본인, 배우자, 부양가족의 질병/부상</li>
+                <li><strong>파산선고:</strong> 개인회생, 파산 등 법원의 결정</li>
+                <li><strong>천재지변:</strong> 재난으로 인한 피해 복구</li>
+            </ul>
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">🏠 중간정산 사유</label>
+            <select id="reason">
+                <option value="house">무주택자 주택 구입</option>
+                <option value="jeonse">주택 전세금</option>
+                <option value="medical">6개월 이상 요양</option>
+                <option value="bankruptcy">파산선고</option>
+                <option value="disaster">천재지변</option>
+            </select>
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">💰 월 평균 급여 (만원)</label>
+            <input type="number" id="salary" placeholder="예: 300">
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">📅 입사일부터 현재까지 근속기간</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <input type="number" id="years" placeholder="년">
+                    <div class="hint">년</div>
+                </div>
+                <div>
+                    <input type="number" id="months" placeholder="개월">
+                    <div class="hint">개월</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="calc-button" onclick="calculate()">💰 중간정산 금액 계산</button>
+
+        <div id="result" class="result">
+            <h3>💳 중간정산 예상 금액</h3>
+            <div class="result-item">
+                <span>정산 사유</span>
+                <span class="result-value" id="selectedReason">-</span>
+            </div>
+            <div class="result-item">
+                <span>총 근속일수</span>
+                <span class="result-value" id="totalDays">-</span>
+            </div>
+            <div class="result-item">
+                <span>중간정산 금액</span>
+                <span class="result-value" id="amount">-</span>
+            </div>
+        </div>
+
+        <div class="warning-box" style="margin-top: 30px;">
+            <h3 style="color: #856404; margin-bottom: 10px;">💡 중간정산 후 주의사항</h3>
+            <p style="color: #856404;">• 중간정산 후 근속연수는 0년부터 다시 시작됩니다</p>
+            <p style="color: #856404;">• 이후 퇴직 시 중간정산 이후 기간만 계산됩니다</p>
+            <p style="color: #856404;">• 증빙 서류 제출 필수 (매매계약서, 전세계약서, 진단서 등)</p>
+        </div>
+
+        <footer>
+            <p>💡 더 많은 정보: <a href="index.html">퇴직금</a> | <a href="retirement-guide.html">퇴직 가이드</a></p>
+            <p>© 2025 퇴직금 계산기</p>
+        </footer>
+    </div>
+
+    <script>
+        function calculate() {
+            const reasonSelect = document.getElementById('reason');
+            const reason = reasonSelect.value;
+            const reasonText = reasonSelect.options[reasonSelect.selectedIndex].text;
+            const salary = parseFloat(document.getElementById('salary').value) * 10000;
+            const years = parseFloat(document.getElementById('years').value || 0);
+            const months = parseFloat(document.getElementById('months').value || 0);
+
+            if (!salary || (years === 0 && months === 0)) {
+                alert('급여와 근속기간을 입력해주세요!');
+                return;
+            }
+
+            const totalDays = (years * 365) + (months * 30);
+
+            if (totalDays < 365) {
+                alert('퇴직금은 1년 이상 근무 시 지급됩니다.');
+                return;
+            }
+
+            // 중간정산 금액 = 1일 평균임금 × 30일 × (재직일수 / 365)
+            const dailyWage = salary / 30;
+            const amount = dailyWage * 30 * (totalDays / 365);
+
+            document.getElementById('selectedReason').textContent = reasonText;
+            document.getElementById('totalDays').textContent = totalDays.toLocaleString('ko-KR') + '일';
+            document.getElementById('amount').textContent = Math.round(amount).toLocaleString('ko-KR') + '원';
+            document.getElementById('result').classList.add('show');
+        }
+    </script>
+</body>
+</html>

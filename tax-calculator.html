@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴직소득세 계산기 - 2025년 세율표 적용</title>
+    <meta name="description" content="퇴직소득세 자동 계산기. 근속연수공제, 환산급여 계산, 2025년 최신 세율표 반영.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #667eea; }
+        h1 { font-size: 2.2em; color: #333; }
+        nav { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        nav a { padding: 12px 20px; background: #f0f0f0; color: #333; text-decoration: none; border-radius: 8px; transition: all 0.3s; }
+        nav a:hover { background: #667eea; color: white; }
+        .info-box { background: #f8f9ff; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .calc-group { margin-bottom: 25px; }
+        .calc-label { display: block; font-weight: 600; margin-bottom: 8px; }
+        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; }
+        .hint { font-size: 0.9em; color: #888; margin-top: 5px; }
+        .calc-button { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: 600; cursor: pointer; }
+        .result { margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; display: none; }
+        .result.show { display: block; }
+        .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .result-value { font-weight: 700; font-size: 1.2em; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        table th, table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        table th { background: #667eea; color: white; }
+        footer { margin-top: 40px; text-align: center; color: #666; }
+        footer a { color: #667eea; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 퇴직소득세 계산기</h1>
+        </header>
+
+        <nav>
+            <a href="index.html">💼 퇴직금 계산</a>
+            <a href="severance-pension.html">🏦 퇴직연금</a>
+            <a href="interim-settlement.html">📝 중간정산</a>
+            <a href="tax-calculator.html">💰 퇴직소득세</a>
+            <a href="retirement-guide.html">📖 퇴직 가이드</a>
+        </nav>
+
+        <div class="info-box">
+            <h3>📌 퇴직소득세란?</h3>
+            <p><strong>계산 방식:</strong> (퇴직금 - 근속연수공제) × 세율 - 누진공제</p>
+            <p><strong>근속연수공제:</strong> 5년 이하 연 100만원, 5년 초과분 연 200만원</p>
+            <p><strong>분리과세:</strong> 다른 소득과 별도로 과세</p>
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">💰 퇴직금 (만원)</label>
+            <input type="number" id="severancePay" placeholder="예: 5000">
+        </div>
+
+        <div class="calc-group">
+            <label class="calc-label">📅 근속 연수 (년)</label>
+            <input type="number" id="years" placeholder="예: 10">
+            <div class="hint">💡 개월은 반올림하여 연수로 계산</div>
+        </div>
+
+        <button class="calc-button" onclick="calculate()">💰 퇴직소득세 계산하기</button>
+
+        <div id="result" class="result">
+            <h3>💳 계산 결과</h3>
+            <div class="result-item">
+                <span>퇴직금</span>
+                <span class="result-value" id="totalAmount">-</span>
+            </div>
+            <div class="result-item">
+                <span>근속연수공제</span>
+                <span class="result-value" id="deduction">-</span>
+            </div>
+            <div class="result-item">
+                <span>과세표준</span>
+                <span class="result-value" id="taxBase">-</span>
+            </div>
+            <div class="result-item">
+                <span>퇴직소득세</span>
+                <span class="result-value" id="incomeTax">-</span>
+            </div>
+            <div class="result-item">
+                <span>지방소득세 (10%)</span>
+                <span class="result-value" id="localTax">-</span>
+            </div>
+            <div class="result-item" style="border-top: 2px solid rgba(255,255,255,0.5); margin-top: 10px; padding-top: 15px;">
+                <span><strong>실수령액</strong></span>
+                <span class="result-value" id="netAmount">-</span>
+            </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 30px;">
+            <h3>📊 2025년 퇴직소득세 세율표</h3>
+            <table>
+                <tr>
+                    <th>과세표준 (환산급여)</th>
+                    <th>세율</th>
+                    <th>누진공제</th>
+                </tr>
+                <tr>
+                    <td>1,200만원 이하</td>
+                    <td>6%</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>4,600만원 이하</td>
+                    <td>15%</td>
+                    <td>108만원</td>
+                </tr>
+                <tr>
+                    <td>8,800만원 이하</td>
+                    <td>24%</td>
+                    <td>522만원</td>
+                </tr>
+                <tr>
+                    <td>1억5천만원 이하</td>
+                    <td>35%</td>
+                    <td>1,490만원</td>
+                </tr>
+                <tr>
+                    <td>3억원 이하</td>
+                    <td>38%</td>
+                    <td>1,940만원</td>
+                </tr>
+                <tr>
+                    <td>5억원 이하</td>
+                    <td>40%</td>
+                    <td>2,540만원</td>
+                </tr>
+                <tr>
+                    <td>5억원 초과</td>
+                    <td>42%</td>
+                    <td>3,540만원</td>
+                </tr>
+            </table>
+        </div>
+
+        <footer>
+            <p>💡 더 많은 정보: <a href="index.html">퇴직금</a> | <a href="retirement-guide.html">퇴직 가이드</a></p>
+            <p>© 2025 퇴직금 계산기</p>
+        </footer>
+    </div>
+
+    <script>
+        function calculate() {
+            const severancePay = parseFloat(document.getElementById('severancePay').value) * 10000;
+            const years = parseFloat(document.getElementById('years').value);
+
+            if (!severancePay || !years) {
+                alert('퇴직금과 근속연수를 입력해주세요!');
+                return;
+            }
+
+            // 근속연수공제 계산
+            let deduction = 0;
+            if (years <= 5) {
+                deduction = years * 1000000; // 100만원 × 년
+            } else {
+                deduction = (5 * 1000000) + ((years - 5) * 2000000); // 500만원 + 200만원 × (년-5)
+            }
+
+            // 과세표준 = (퇴직금 - 근속연수공제) / 근속연수 × 12 (환산급여)
+            const taxableIncome = severancePay - deduction;
+            if (taxableIncome <= 0) {
+                document.getElementById('totalAmount').textContent = formatNumber(severancePay);
+                document.getElementById('deduction').textContent = formatNumber(deduction);
+                document.getElementById('taxBase').textContent = '0원';
+                document.getElementById('incomeTax').textContent = '0원';
+                document.getElementById('localTax').textContent = '0원';
+                document.getElementById('netAmount').textContent = formatNumber(severancePay);
+                document.getElementById('result').classList.add('show');
+                return;
+            }
+
+            const annualIncome = (taxableIncome / years) * 12; // 환산급여
+
+            // 세율표 적용
+            let taxRate = 0;
+            let deductAmount = 0;
+
+            if (annualIncome <= 12000000) {
+                taxRate = 0.06;
+                deductAmount = 0;
+            } else if (annualIncome <= 46000000) {
+                taxRate = 0.15;
+                deductAmount = 1080000;
+            } else if (annualIncome <= 88000000) {
+                taxRate = 0.24;
+                deductAmount = 5220000;
+            } else if (annualIncome <= 150000000) {
+                taxRate = 0.35;
+                deductAmount = 14900000;
+            } else if (annualIncome <= 300000000) {
+                taxRate = 0.38;
+                deductAmount = 19400000;
+            } else if (annualIncome <= 500000000) {
+                taxRate = 0.40;
+                deductAmount = 25400000;
+            } else {
+                taxRate = 0.42;
+                deductAmount = 35400000;
+            }
+
+            // 퇴직소득세 = [(환산급여 × 세율 - 누진공제) × 근속연수 / 12]
+            const annualTax = (annualIncome * taxRate) - deductAmount;
+            const incomeTax = (annualTax * years) / 12;
+            const localTax = incomeTax * 0.1; // 지방소득세 10%
+            const totalTax = incomeTax + localTax;
+            const netAmount = severancePay - totalTax;
+
+            document.getElementById('totalAmount').textContent = formatNumber(severancePay);
+            document.getElementById('deduction').textContent = formatNumber(deduction);
+            document.getElementById('taxBase').textContent = formatNumber(taxableIncome);
+            document.getElementById('incomeTax').textContent = formatNumber(incomeTax);
+            document.getElementById('localTax').textContent = formatNumber(localTax);
+            document.getElementById('netAmount').textContent = formatNumber(netAmount);
+            document.getElementById('result').classList.add('show');
+        }
+
+        function formatNumber(num) {
+            return Math.round(num).toLocaleString('ko-KR') + '원';
+        }
+    </script>
+</body>
+</html>
