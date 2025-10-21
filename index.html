@@ -457,6 +457,14 @@
             document.getElementById('tax').textContent = formatNumber(tax);
             document.getElementById('netAmount').textContent = formatNumber(netAmount);
             document.getElementById('result').classList.add('show');
+
+            // URL 파라미터에 결과 저장 (공유용)
+            const resultUrl = new URL(window.location.href);
+            resultUrl.searchParams.set('severance', Math.round(severancePay));
+            resultUrl.searchParams.set('net', Math.round(netAmount));
+            resultUrl.searchParams.set('years', years);
+            resultUrl.searchParams.set('months', months);
+            window.history.pushState({}, '', resultUrl);
         }
 
         // 사용자 카운터 초기화 및 애니메이션
@@ -561,6 +569,39 @@
                 navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
+
+        // 페이지 로드 시 공유된 결과 표시
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedSeverance = urlParams.get('severance');
+            const sharedNet = urlParams.get('net');
+            const sharedYears = urlParams.get('years');
+            const sharedMonths = urlParams.get('months');
+
+            if (sharedSeverance && sharedNet) {
+                // 공유된 결과 표시
+                document.getElementById('severancePay').textContent = formatNumber(parseInt(sharedSeverance));
+                document.getElementById('netAmount').textContent = formatNumber(parseInt(sharedNet));
+
+                // 결과 섹션 표시
+                document.getElementById('result').classList.add('show');
+
+                // 결과 상단에 안내 메시지 표시
+                const resultSection = document.getElementById('result');
+                const workPeriod = sharedYears > 0 ? `${sharedYears}년` + (sharedMonths > 0 ? ` ${sharedMonths}개월` : '') : `${sharedMonths}개월`;
+                resultSection.insertAdjacentHTML('afterbegin',
+                    `<p style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #856404; text-align: center;">
+                        💼 공유된 퇴직금 계산 결과 (근속 ${workPeriod})<br>
+                        <span style="font-size: 14px;">나도 내 퇴직금을 계산해보세요 👆</span>
+                    </p>`
+                );
+
+                // 스크롤을 결과 영역으로 이동
+                setTimeout(() => {
+                    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        });
 
         // 페이지 로드 시 카운터 초기화
         window.addEventListener('load', initUsageCounter);

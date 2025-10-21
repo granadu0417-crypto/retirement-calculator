@@ -1,0 +1,106 @@
+// Cloudflare Pages Function - 퇴직금 계산기 결과 공유 동적 OG 태그
+
+const CRAWLER_PATTERNS = [
+  'kakaotalk', 'facebookexternalhit', 'Facebot', 'Twitterbot', 'LinkedInBot',
+  'Slackbot', 'TelegramBot', 'WhatsApp', 'Pinterest', 'Googlebot', 'bingbot', 'Discordbot'
+];
+
+function isCrawler(userAgent) {
+  if (!userAgent) return false;
+  const ua = userAgent.toLowerCase();
+  return CRAWLER_PATTERNS.some(pattern => ua.includes(pattern.toLowerCase()));
+}
+
+function formatNumber(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function generateOGTags(urlParams) {
+  const severance = urlParams.get('severance');
+  const net = urlParams.get('net');
+  const years = urlParams.get('years') || '0';
+  const months = urlParams.get('months') || '0';
+
+  if (!severance || !net) {
+    return null;
+  }
+
+  const severanceFormatted = formatNumber(parseInt(severance));
+  const netFormatted = formatNumber(parseInt(net));
+
+  // 근속기간 표시
+  const workPeriod = parseInt(years) > 0
+    ? `${years}년` + (parseInt(months) > 0 ? ` ${months}개월` : '')
+    : `${months}개월`;
+
+  const shareTitle = `💼 내 퇴직금: ${netFormatted}원!`;
+  const shareDescription = `근속 ${workPeriod} · 세전 ${severanceFormatted}원 → 세후 ${netFormatted}원\n당신의 퇴직금도 계산해보세요 👉`;
+
+  return {
+    title: shareTitle,
+    description: shareDescription
+  };
+}
+
+function injectOGTags(html, ogData) {
+  if (!ogData) return html;
+
+  let modifiedHtml = html.replace(/<meta property="og:.*?".*?>/g, '');
+
+  const ogTags = `
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="${escapeHtml(ogData.title)}">
+    <meta property="og:description" content="${escapeHtml(ogData.description)}">
+    <meta property="og:url" content="https://retirement-calculator-lxk.pages.dev/">
+    <meta property="og:site_name" content="퇴직금 계산기">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${escapeHtml(ogData.title)}">
+    <meta name="twitter:description" content="${escapeHtml(ogData.description)}">
+  `;
+
+  modifiedHtml = modifiedHtml.replace('</head>', `${ogTags}\n</head>`);
+  return modifiedHtml;
+}
+
+function escapeHtml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+export async function onRequest(context) {
+  const { request, next } = context;
+  const userAgent = request.headers.get('User-Agent') || '';
+  const url = new URL(request.url);
+
+  if (!isCrawler(userAgent)) {
+    return next();
+  }
+
+  const ogData = generateOGTags(url.searchParams);
+
+  if (!ogData) {
+    return next();
+  }
+
+  const response = await next();
+  const contentType = response.headers.get('Content-Type') || '';
+
+  if (!contentType.includes('text/html')) {
+    return response;
+  }
+
+  let html = await response.text();
+  html = injectOGTags(html, ogData);
+
+  return new Response(html, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
