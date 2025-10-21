@@ -68,14 +68,14 @@ function injectOGTags(html, ogData) {
     <meta property="og:type" content="website">
     <meta property="og:title" content="${escapeHtml(ogData.title)}">
     <meta property="og:description" content="${escapeHtml(ogData.description)}">
-    <meta property="og:url" content="https://retirement-calculator-8mz.pages.dev/">
+    <meta property="og:url" content="https://retirement-calculator-4s7.pages.dev/">
     <meta property="og:site_name" content="퇴직금 계산기">
-    <meta property="og:image" content="https://retirement-calculator-8mz.pages.dev/og-image.jpg">
+    <meta property="og:image" content="https://retirement-calculator-4s7.pages.dev/og-image.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${escapeHtml(ogData.title)}">
     <meta name="twitter:description" content="${escapeHtml(ogData.description)}">
-    <meta name="twitter:image" content="https://retirement-calculator-8mz.pages.dev/og-image.jpg">
+    <meta name="twitter:image" content="https://retirement-calculator-4s7.pages.dev/og-image.jpg">
   `;
 
   // <head> 태그 내부에 삽입
