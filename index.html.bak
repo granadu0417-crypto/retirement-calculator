@@ -9,15 +9,6 @@
     <meta property="og:title" content="퇴직금 계산기 - 정확한 퇴직금 자동 계산">
     <meta property="og:description" content="근속연수별 퇴직금, 평균임금, 퇴직소득세 한번에 계산. 2025년 최신 법률 반영">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://retirement-calculator-4s7.pages.dev/">
-    <meta property="og:image" content="https://retirement-calculator-4s7.pages.dev/og-image.jpg">
-
-    <!-- PWA 지원 -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="퇴직금 계산기">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -180,123 +171,6 @@
             .container { padding: 20px; }
             h1 { font-size: 1.6em; }
         }
-
-        /* 바이럴 기능 스타일 */
-        .usage-counter {
-            text-align: center;
-            padding: 15px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
-        .usage-counter .label {
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        .usage-counter .count {
-            font-size: 24px;
-            font-weight: 700;
-            color: #FEE500;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .share-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-        .share-section h4 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1.1em;
-        }
-        .share-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .btn-share {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-share:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .btn-facebook {
-            background: #1877F2;
-            color: white;
-        }
-        .btn-copy {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-copy.copied {
-            background: #28a745;
-        }
-        .bookmark-popup {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            max-width: 300px;
-            z-index: 1000;
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        .bookmark-popup h4 {
-            margin-bottom: 10px;
-            color: #667eea;
-        }
-        .bookmark-popup p {
-            margin-bottom: 15px;
-            color: #666;
-            font-size: 0.9em;
-        }
-        .bookmark-popup-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .bookmark-popup-buttons button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .btn-bookmark-yes {
-            background: #667eea;
-            color: white;
-        }
-        .btn-bookmark-no {
-            background: #e0e0e0;
-            color: #666;
-        }
     </style>
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TWVG616XGC"></script>
@@ -312,10 +186,6 @@
         <header>
             <h1>💼 퇴직금 계산기</h1>
             <p class="subtitle">2025년 최신 근로기준법 반영 · 정확한 퇴직금 계산</p>
-            <div class="usage-counter">
-                <div class="label">누적 사용자</div>
-                <div class="count"><span id="usageCount">0</span>명</div>
-            </div>
         </header>
 
         <nav>
@@ -383,18 +253,6 @@
                 <span><strong>실수령액 (약)</strong></span>
                 <span class="result-value" id="netAmount">-</span>
             </div>
-
-            <div class="share-section">
-                <h4>💬 친구에게 공유하기</h4>
-                <div class="share-buttons">
-                    <button class="btn-share btn-facebook" onclick="shareFacebook()">
-                        <span>📘</span> 페이스북
-                    </button>
-                    <button class="btn-share btn-copy" id="copyBtn" onclick="copyLink()">
-                        <span>🔗</span> 링크 복사
-                    </button>
-                </div>
-            </div>
         </div>
 
         <div class="warning">
@@ -458,123 +316,7 @@
             document.getElementById('netAmount').textContent = formatNumber(netAmount);
             document.getElementById('result').classList.add('show');
         }
-
-        // 사용자 카운터 초기화 및 애니메이션
-        function initUsageCounter() {
-            const storageKey = 'retirement_usage_count';
-            const baseCount = 98450;
-            let currentCount = parseInt(localStorage.getItem(storageKey)) || baseCount;
-            currentCount++;
-            localStorage.setItem(storageKey, currentCount);
-
-            const formattedCount = currentCount.toLocaleString('ko-KR');
-            const countElement = document.getElementById('usageCount');
-            let start = currentCount - 100;
-            const duration = 1000;
-            const increment = 100 / (duration / 16);
-            let current = start;
-
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= currentCount) {
-                    countElement.textContent = formattedCount;
-                    clearInterval(timer);
-                } else {
-                    countElement.textContent = Math.floor(current).toLocaleString('ko-KR');
-                }
-            }, 16);
-
-            // 3회 이상 방문 시 북마크 팝업
-            const visitCount = parseInt(localStorage.getItem('retirement_visit_count')) || 0;
-            const newVisitCount = visitCount + 1;
-            localStorage.setItem('retirement_visit_count', newVisitCount);
-
-            if (newVisitCount === 3 && !localStorage.getItem('retirement_bookmark_shown')) {
-                setTimeout(showBookmarkPopup, 2000);
-            }
-        }
-
-        // 페이스북 공유
-        function shareFacebook() {
-            const url = encodeURIComponent(window.location.href);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
-        }
-
-        // 링크 복사
-        function copyLink() {
-            const url = window.location.href;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url).then(() => {
-                    const btn = document.getElementById('copyBtn');
-                    const originalHTML = btn.innerHTML;
-                    btn.innerHTML = '<span>✅</span> 복사완료!';
-                    btn.classList.add('copied');
-                    setTimeout(() => {
-                        btn.innerHTML = originalHTML;
-                        btn.classList.remove('copied');
-                    }, 2000);
-                }).catch(() => fallbackCopyLink(url));
-            } else {
-                fallbackCopyLink(url);
-            }
-        }
-
-        function fallbackCopyLink(url) {
-            const textArea = document.createElement('textarea');
-            textArea.value = url;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                alert('링크가 복사되었습니다!');
-            } catch (err) {
-                alert('링크 복사에 실패했습니다.');
-            }
-            document.body.removeChild(textArea);
-        }
-
-        // 북마크 팝업 표시
-        function showBookmarkPopup() {
-            const popup = document.getElementById('bookmarkPopup');
-            if (popup) {
-                popup.style.display = 'block';
-            }
-        }
-
-        function closeBookmarkPopup(addBookmark) {
-            const popup = document.getElementById('bookmarkPopup');
-            if (popup) {
-                popup.style.display = 'none';
-            }
-            localStorage.setItem('retirement_bookmark_shown', 'true');
-
-            if (addBookmark) {
-                alert('Ctrl+D (Windows) 또는 Cmd+D (Mac)를 눌러 북마크에 추가하세요!');
-            }
-        }
-
-        // 서비스 워커 등록 (PWA)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
-        }
-
-        // 페이지 로드 시 카운터 초기화
-        window.addEventListener('load', initUsageCounter);
     </script>
-
-    <!-- 북마크 추가 팝업 -->
-    <div id="bookmarkPopup" class="bookmark-popup" style="display: none;">
-        <h4>⭐ 북마크 추가</h4>
-        <p>자주 사용하시나요? 북마크에 추가하고 빠르게 접속하세요!</p>
-        <div class="bookmark-popup-buttons">
-            <button class="btn-bookmark-yes" onclick="closeBookmarkPopup(true)">추가하기</button>
-            <button class="btn-bookmark-no" onclick="closeBookmarkPopup(false)">나중에</button>
-        </div>
-    </div>
   <!-- 방문자 추적 스크립트 -->
   <script>
   (function() {
